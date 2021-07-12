@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
+/* Function Component */
 function Square(props) {
   return (
     <button className="square" onClick={props.onClick}>
@@ -14,8 +15,8 @@ class Board extends React.Component {
   renderSquare(i) {
     return (
       <Square
-        value={this.props.squares[i]}
-        onClick={() => this.props.onClick(i)}
+        value={this.props.squares[i]} // passing a prop "value" to the Square
+        onClick={() => this.props.onClick(i)} // passing a prop function "onClick" that Square calls when clicked
       />
     );
   }
@@ -44,23 +45,27 @@ class Board extends React.Component {
 }
 
 class Game extends React.Component {
+  // adding constructor to initialize the state of Game
   constructor(props) {
     super(props);
+    // setting the initial state of the Game to an array of 9 nulls corresponding to the squares
     this.state = {
       history: [
         {
           squares: Array(9).fill(null),
         },
       ],
-      stepNumber: 0,
-      xIsNext: true,
+      stepNumber: 0, // initialize the step number we are in
+      xIsNext: true, // boolean used to determined which player goes next
     };
   }
 
   handleClick(i) {
-    const history = this.state.history.slice(0, this.state.stepNumber + 1);
+    const history = this.state.history.slice(0, this.state.stepNumber + 1); // updates future state if a new change is made from a previous point
     const current = history[history.length - 1];
-    const squares = current.squares.slice();
+    const squares = current.squares.slice(); // using slice to create a copy of the squares array
+
+    // ignore a click if someone has won or Square is already filled
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
@@ -71,21 +76,24 @@ class Game extends React.Component {
           squares: squares,
         },
       ]),
-      stepNumber: history.length,
-      xIsNext: !this.state.xIsNext,
+      stepNumber: history.length, // indicates which step we are viewing
+      xIsNext: !this.state.xIsNext, // flips the value of xIsNext
     });
   }
+  // jumpTo method updates the stepNumber and sets xIsNext to true if even
   jumpTo(step) {
     this.setState({
       stepNumber: step,
       xIsNext: step % 2 === 0,
     });
   }
+  // render is using the most recent history to determine and display game status
   render() {
     const history = this.state.history;
-    const current = history[this.state.stepNumber];
+    const current = history[this.state.stepNumber]; // render the current selected move according to stepNumber
     const winner = calculateWinner(current.squares);
 
+    // mapping over the history of moves to Reach Elements
     const moves = history.map((step, move) => {
       const desc = move ? "Go to move #" + move : "Go to game start";
       return (
@@ -118,6 +126,8 @@ class Game extends React.Component {
   }
 }
 
+/* Helper Function */
+// Function will check for a winner and return X , O, or null as appropriate
 function calculateWinner(squares) {
   const lines = [
     [0, 1, 2],
